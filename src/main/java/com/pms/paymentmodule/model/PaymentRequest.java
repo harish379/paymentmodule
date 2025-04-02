@@ -11,5 +11,6 @@ public class PaymentRequest {
     private String bookingId;
     private double transactionAmount;
     private String transactionStatus;
+    private String userId;
 }
 

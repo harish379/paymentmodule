@@ -10,23 +10,19 @@ import com.pms.paymentmodule.service.PaymentService;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200") 
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")  
 public class PaymentController {
 
     private final PaymentService paymentService;
 
     // Endpoint to store a payment transaction
     @PostMapping("/save")
-    public ResponseEntity<Payment> savePayment(@RequestBody PaymentRequest request) {
-        Payment payment = paymentService.savePayment(
-                request.getTransactionId(),
-                request.getTransactionType(),
-                request.getBookingId(),
-                request.getTransactionAmount(),
-                request.getTransactionStatus()
-        );
-        return ResponseEntity.ok(payment);
+    public ResponseEntity<Payment> savePayment(@RequestBody Payment payment) {
+        Payment savedPayment = paymentService.savePayment(payment);
+        return ResponseEntity.ok(savedPayment);
     }
+    
 
     // Endpoint to retrieve transaction by ID
     @GetMapping("/{transactionId}")
