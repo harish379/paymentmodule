@@ -2,12 +2,10 @@ package com.pms.paymentmodule.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import com.pms.paymentmodule.model.Payment;
 import com.pms.paymentmodule.repository.PaymentRepository;
-
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -15,14 +13,9 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    private RestTemplate restTemplate;
-
     public Payment savePayment(Payment payment) {
         payment.setTransactionDate(new Date()); // Set transaction date before saving
-
-
-        String bookingId = payment.getBookingId();
-        updatePaymentTimeInBooking(bookingId);
+        payment.setTransactionStatus("Success"); // Set transaction status as success
         return paymentRepository.save(payment);  // Save in DB
     }
 
@@ -30,16 +23,11 @@ public class PaymentService {
         return paymentRepository.findByTransactionId(transactionId);
     }
 
-
-
-
-    public void updatePaymentTimeInBooking(String bookingId) {
-        try {
-            String url = "http://localhost:8082/bookings/updatePaymentTime?bookingId=" + bookingId;
-            restTemplate.put(url, null);
-        } catch (Exception e) {
-            System.err.println("Error updating booking payment time: " + e.getMessage());
-        }
+    public Payment getPaymentByBookingId(String bookingId) {
+        UUID uuid = UUID.fromString(bookingId); // Convert String to UUID
+        return paymentRepository.findByBookingId(uuid)
+                .orElseThrow(() -> new RuntimeException("Payment not found for bookingId: " + bookingId));
     }
+   
 }
 

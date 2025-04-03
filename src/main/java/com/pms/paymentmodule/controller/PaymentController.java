@@ -3,8 +3,9 @@ package com.pms.paymentmodule.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.pms.paymentmodule.dto.ApiResponse;
 import com.pms.paymentmodule.model.Payment;
-import com.pms.paymentmodule.model.PaymentRequest;
 import com.pms.paymentmodule.service.PaymentService;
 
 @RestController
@@ -18,9 +19,11 @@ public class PaymentController {
 
     // Endpoint to store a payment transaction
     @PostMapping("/save")
-    public ResponseEntity<Payment> savePayment(@RequestBody Payment payment) {
+    public ResponseEntity<ApiResponse<Payment>> savePayment(@RequestBody Payment payment) {
         Payment savedPayment = paymentService.savePayment(payment);
-        return ResponseEntity.ok(savedPayment);
+
+         ApiResponse<Payment> response = new ApiResponse<>(true, "Payment processed successfully", savedPayment);
+        return ResponseEntity.ok(response);
     }
     
 

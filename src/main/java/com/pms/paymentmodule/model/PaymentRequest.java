@@ -12,5 +12,6 @@ public class PaymentRequest {
     private double transactionAmount;
     private String transactionStatus;
     private String userId;
+    
 }
 

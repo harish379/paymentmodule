@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "payments")
@@ -31,15 +32,88 @@ public class Payment {
     private Date transactionDate; // Timestamp of transaction
 
     @Column(nullable = false)
+    @JsonProperty("cardType")
     private String transactionType; // Credit/Debit
 
     @Column(nullable = false)
+    @JsonProperty("paymentAmount")
     private double transactionAmount; // Amount of transaction
 
     @Column(nullable = false)
     private String transactionStatus;// Success/Failure/Pending
 
-    private String bookingId; // Related booking reference
+    private UUID bookingId;
+    
+    // Related booking reference
+
+
+    public long getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(long uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public Date getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(Date transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public double getTransactionAmount() {
+        return transactionAmount;
+    }
+
+    public void setTransactionAmount(double transactionAmount) {
+        this.transactionAmount = transactionAmount;
+    }
+
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+    
+    public void setBookingId(UUID bookingId) {
+        this.bookingId = bookingId;
+    }
 
     @PrePersist
 	    public void generateIds() {
@@ -60,7 +134,7 @@ public class Payment {
 	        return "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
 	    }
 
-        public String getBookingId() {
+        public UUID getBookingId() {
             return bookingId;
         }
 
