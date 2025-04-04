@@ -24,12 +24,8 @@ public class InvoiceController {
      * @param bookingId The ID of the booking for which the invoice needs to be generated.
      * @return The generated invoice.
      */
-    @PostMapping("/generate/{bookingId}")
-    public ResponseEntity<Invoice> generateInvoice(@PathVariable UUID bookingId) {
-        Invoice invoice = invoiceService.generateInvoice(bookingId);
-        return new ResponseEntity<>(invoice, HttpStatus.CREATED);
-    }
 
+     
     /**
      * Get invoice details by invoice number.
      * 
@@ -50,6 +46,8 @@ public class InvoiceController {
      */
     @GetMapping("/download/{bookingId}")
     public ResponseEntity<byte[]> downloadInvoice(@PathVariable UUID bookingId) {
+
+        invoiceService.generateInvoice(bookingId);
         byte[] pdfBytes = invoiceService.generateInvoicePdf(bookingId);
         
         HttpHeaders headers = new HttpHeaders();

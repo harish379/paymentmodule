@@ -2,6 +2,8 @@ package com.pms.paymentmodule.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 import java.util.UUID;
 import com.pms.paymentmodule.model.Booking;
 import com.pms.paymentmodule.model.Invoice;
@@ -26,8 +28,13 @@ public class InvoiceService {
     @Autowired
     private InvoiceRepository invoiceRepository;
 
-    public Invoice generateInvoice(UUID bookingId) {
+    public void generateInvoice(UUID bookingId) {
         // Fetch booking details from the local database
+
+        Optional<Invoice> existing = invoiceRepository.findByBookingId(bookingId);
+        if (existing.isPresent()) {
+            return; // Invoice already exists for this booking
+        }
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found for ID: " + bookingId));
 
@@ -36,7 +43,7 @@ public class InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Payment not found for Booking ID: " + bookingId));
 
         // Generate Invoice Number
-        String invoiceNumber = "INV-" + UUID.randomUUID().toString().substring(0, 8);
+        String invoiceNumber = "INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         // Create and Save Invoice
         Invoice invoice = new Invoice();
@@ -57,54 +64,13 @@ public class InvoiceService {
         invoice.setParcelServiceCost(booking.getParcelServiceCost());
         invoice.setParcelPaymentTime(payment.getTransactionDate());
 
-        return invoiceRepository.save(invoice);
+         invoiceRepository.save(invoice);
     }
-
-
-//     public byte[] generateInvoicePdf(UUID bookingId) {
-//     Invoice invoice = invoiceRepository.findByBookingId(bookingId)
-//             .orElseThrow(() -> new RuntimeException("Invoice not found for bookingId: " + bookingId));
-
-//     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-//         Document document = new Document();
-//         PdfWriter.getInstance(document, baos);
-//         document.open();
-
-//         // Add Title
-//         Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
-//         Paragraph title = new Paragraph("Invoice", titleFont);
-//         title.setAlignment(Element.ALIGN_CENTER);
-//         document.add(title);
-//         document.add(new Paragraph("\n"));
-
-//         // Add Invoice Details
-//         document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber()));
-//         document.add(new Paragraph("Booking ID: " + invoice.getBookingId()));
-//         document.add(new Paragraph("Payment ID: " + invoice.getPaymentId()));
-//         document.add(new Paragraph("Transaction ID: " + invoice.getTransactionId()));
-//         document.add(new Paragraph("Transaction Amount: $" + invoice.getParcelServiceCost()));
-//         document.add(new Paragraph("Receiver Name: " + invoice.getReceiverName()));
-//         document.add(new Paragraph("Receiver Address: " + invoice.getReceiverAddress()));
-//         document.add(new Paragraph("Receiver Mobile: " + invoice.getReceiverMobile()));
-//         document.add(new Paragraph("\n"));
-
-//         document.close();
-
-//         return baos.toByteArray(); // Convert PDF to byte array
-//     } catch (Exception e) {
-//         throw new RuntimeException("Error generating invoice PDF", e);
-//     }
-// }
 
     public Invoice getInvoiceByNumber(String invoiceNumber) {
         return invoiceRepository.findByInvoiceNumber(invoiceNumber)
                 .orElseThrow(() -> new RuntimeException("Invoice not found for number: " + invoiceNumber));
     }
-
-
-
-
-
 
     public byte[] generateInvoicePdf(UUID bookingId) {
         Invoice invoice = invoiceRepository.findByBookingId(bookingId)
